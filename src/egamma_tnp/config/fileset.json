@@ -7,7 +7,8 @@
         "luminosity": 0.00,
         "Legend": "Run2024C",
         "isMC": false,
-        "is_target": true
+        "is_target": true,
+        "goldenjson": "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions24/Cert_Collisions2024_eraC_Golden.json"
     },
     "DYTo2L": {
         "files": [

@@ -14,5 +14,29 @@
         "hist_range": [-2.7, 2.7],
         "n_bins": 60,
         "custom_bin_edges": null
+    },
+    "el_phi": {
+        "name": "el_phi",
+        "xlabel": "$\\phi$",
+        "ylabel": "Events per bin",
+        "hist_range": [-3.2, 3.2],
+        "n_bins": 60,
+        "custom_bin_edges": null
+    },
+    "tag_Ele_eta": {
+        "name": "tag_Ele_eta",
+        "xlabel": "$tag \\eta$",
+        "ylabel": "Events per bin",
+        "hist_range": [-2.7, 2.7],
+        "n_bins": 60,
+        "custom_bin_edges": null
+    },
+    "tag_Ele_phi": {
+        "name": "tag_Ele_phi",
+        "xlabel": "$tag \\phi$",
+        "ylabel": "Events per bin",
+        "hist_range": [-3.2, 3.2],
+        "n_bins": 60,
+        "custom_bin_edges": null
     }
 }
