@@ -71,25 +71,25 @@ class Commissioning_hists:
         return fileset_json
 
     def load_samples(self, samples_config):
-        num_target = 0
-        target_sample_dict = {}
-        reference_samples_dict = {}
+        num_reference = 0
+        reference_sample_dict = {}
+        target_samples_dict = {}
 
         for key in samples_config.keys():
-            if samples_config[key]["is_target"]:
-                if num_target > 0:
-                    print("There are more than one target samples. Exiting now...")
+            if samples_config[key]["is_reference"]:
+                if num_reference > 0:
+                    print("There are more than one reference samples. Exiting now...")
                     sys.exit()
 
-                num_target += 1
+                num_reference += 1
                 print(f"\t INFO: Loading {key} parquet files")
-                target_sample_dict[key] = self.basic_preselection(samples_config[key])
+                reference_sample_dict[key] = self.basic_preselection(samples_config[key])
 
             else:
                 print(f"\t INFO: Loading {key} parquet files")
-                reference_samples_dict[key] = self.basic_preselection(samples_config[key])
+                target_samples_dict[key] = self.basic_preselection(samples_config[key])
 
-        return target_sample_dict, reference_samples_dict
+        return reference_sample_dict, target_samples_dict
 
     def fetch_golden_json(self, goldenjson_url):
 
@@ -125,6 +125,17 @@ class Commissioning_hists:
 
         return local_file_path
 
+    def get_color_index(self, data_idx, MC_idx, samples_config):
+
+        if samples_config["isMC"]:
+            MC_idx += 1
+            color = self.MC_color_list[MC_idx]
+        else:
+            data_idx += 1
+            color = self.data_color_list[data_idx]
+
+        return data_idx, MC_idx, color
+
     def basic_preselection(self, sample_config):
 
         events = ak.from_parquet(sample_config["files"])
@@ -143,8 +154,8 @@ class Commissioning_hists:
         pass_tag_pt_cut = (events.tag_Ele_pt > self.tag_pt_cut)
         pass_probe_pt_cut = (events.el_pt > self.probe_pt_cut)
 
-        pass_tag_SC_abseta = (abs(events.tag_Ele_eta + events.tag_Ele_deltaEtaSC) < self.tag_max_SC_abseta) #  have to change to SC eta
-        pass_probe_SC_abseta = (abs(events.el_eta + events.el_deltaEtaSC) < self.probe_max_SC_abseta) #  have to change to SC eta
+        pass_tag_SC_abseta = (abs(events.tag_Ele_eta + events.tag_Ele_deltaEtaSC) < self.tag_max_SC_abseta)
+        pass_probe_SC_abseta = (abs(events.el_eta + events.el_deltaEtaSC) < self.probe_max_SC_abseta)
 
         is_in_mass_range = (
             (events.pair_mass > self.Z_mass_range[0])
@@ -160,6 +171,10 @@ class Commissioning_hists:
             & is_in_mass_range
         ]
 
+        # add SC eta
+        events["tag_Ele_SC_eta"] = events.tag_Ele_eta + events.tag_Ele_deltaEtaSC
+        events["el_SC_eta"] = events.el_eta + events.el_deltaEtaSC
+
         return events
 
     def get_histogram_with_overflow(self, var_config, var_values, probe_region, weight):
@@ -173,46 +188,79 @@ class Commissioning_hists:
 
         h = Hist(
             hist.axis.Variable(bins, label=x_label, overflow=True, underflow=True),
-            # storage=hist.storage.Weight(),
+            storage=hist.storage.Weight(),
         )
         h.fill(var_values, weight=weight)
 
-        return h
+        h_weighted_mean = hist.accumulators.WeightedMean().fill(var_values, weight=weight)
 
-    def get_histograms_ratio(self, hist_target, hist_reference):
-        return hist_target/hist_reference
+        return h, h_weighted_mean, h.sum().value
 
-    def plot_var_histogram(self, samples_config, var_config, var_values, ax, probe_region, color, is_mass_var=False, norm_val=None, pileup_weight=None):
+    def get_histograms_ratio(self, hist_target, hist_reference, yerr_target):
+        ratio_values = hist_target.values() / hist_reference.values()
+        ratio = hist.Hist(hist.Hist(*hist_target.axes))
+        ratio[:] = np.nan_to_num(ratio_values)
+
+        ratio_err_target = yerr_target / hist_target.values()
+        ratio_err_target = np.nan_to_num(ratio_err_target)
+
+        return ratio, ratio_err_target
+
+    def plot_var_histogram(self, samples_config, vars_config, samples, var, pileup_corr, ax, probe_region, color, norm_val=None):
+
+        if samples_config["isMC"]:
+            pileup_weight = get_pileup_weight(samples.Pileup_nTrueInt, pileup_corr)
+
+        else:
+            pileup_weight = 1
+
+        h, h_weighted_mean, _ = self.get_histogram_with_overflow(vars_config[var], samples[var], probe_region=probe_region, weight=pileup_weight)
+
+        legend = samples_config["Legend"]
+
+        if "mass" in var:
+            legend += f" [$\mu$={h_weighted_mean.value:.2f}, $\sigma$={np.sqrt(h_weighted_mean.variance):.2f}]"
+
+        if norm_val is not None:
+            h = h * (norm_val / h.sum().value)
 
         if samples_config["isMC"]:
             hist_type = "step"
-            w2method = "sqrt"
-
+            yerr = np.nan_to_num(np.sqrt(h.variances()))
         else:
             hist_type = "errorbar"
-            w2method = "poisson"
+            yerr = np.nan_to_num(np.sqrt(h.values()))
 
-        weight = pileup_weight if pileup_weight is not None else 1
+        hep.histplot(h, label=legend, histtype=hist_type, yerr=yerr, flow="sum", ax=ax[0], color=color)
 
-        hist = self.get_histogram_with_overflow(var_config, var_values, probe_region=probe_region, weight=weight)
+        return h, yerr
 
-        # hist_type = "step" if samples_config["isMC"] else "errorbar"
-        legend = samples_config["Legend"]
+    def plot_ratio(self, samples_config, hist_target, hist_reference, yerr_target, ax, color):
+        ratio, ratio_error = self.get_histograms_ratio(hist_target, hist_reference, yerr_target)
+        hist_type = "step" if samples_config["isMC"] else "errorbar"
 
-        if norm_val is not None:
-            hist = hist * (norm_val / hist.sum())
+        hep.histplot(ratio, histtype=hist_type, flow="sum", ax=ax[1], color=color, yerr=ratio_error)
 
-        hep.histplot(hist, label=legend, histtype=hist_type, yerr=True, w2method=w2method, flow="sum", ax=ax[0], color=color)
+        return 0
 
-        return hist, hist.sum()
+    def plot_fill_between_uncertainty(self, h, ax, color):
+        errors_den = np.sqrt(h.variances()) / h.values()
 
-    def plot_ratio(self, samples_config, hist_target, hist_reference, ax, color):
-        hist = self.get_histograms_ratio(hist_target, hist_reference)
-        #hist_type = "step" if samples_config["isMC"] else "errorbar"
-        hist_type = "errorbar"
+        errors_den = np.nan_to_num(errors_den)
 
-        hep.histplot(hist, histtype=hist_type, flow="sum", ax=ax[1], color=color, yerr=False)
+        lower_bound = 1 - errors_den
+        upper_bound = 1 + errors_den
 
+        ax[1].fill_between(
+            h.to_numpy()[1][:-1],
+            lower_bound,
+            upper_bound,
+            hatch='XXX',
+            step='post',
+            facecolor="none",
+            edgecolor=color,
+            linewidth=0
+        )
         return 0
 
     def create_and_save_histograms(self):
@@ -225,31 +273,49 @@ class Commissioning_hists:
         else:
             sys.exit(f"\t The directory '{self.out_dir}' already exists. Exiting now to avoid overwriting existing plots.")
 
-        var_config = self.load_json(self.var_json)
-        input_fileset = self.load_json(self.fileset_json)
-        target_sample, refrence_samples = self.load_samples(input_fileset)
+        vars_config = self.load_json(self.var_json)
+        input_config = self.load_json(self.fileset_json)
+
+        input_fileset = input_config["samples_to_compare"]
+        pileup_histogram = input_config["pileup_histogram"]
+
+        reference_sample, target_samples = self.load_samples(input_fileset)
+
+        # create pileup correction
+        if (pileup_histogram is not None) and (not os.path.exists(f"{pileup_histogram.split('.')[0]}_correction_MC2024.json")):
+            create_correction(pileup_histogram, self.MC2024_pileup, outfile=f"{pileup_histogram.split('.')[0]}_correction_MC2024.json", normalize_pu_mc_array=True)
+
+        pileup_corr = load_correction(f"{pileup_histogram.split('.')[0]}_correction_MC2024.json")
 
         plt.style.use(hep.style.CMS)
 
-        (target_key, ) = target_sample
+        (reference_key, ) = reference_sample
 
         for probe_region in ["EB", "EE"]:
 
-            target_sample_ = target_sample[target_key]
+            reference_sample_ = reference_sample[reference_key]
 
-            refrence_samples_ = {}
+            data_color_idx = -1
+            MC_color_idx = -1
+
+            target_samples_ = {}
+            target_samples_color = {}
             if probe_region == "EB":
-                target_sample_ = target_sample_[abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) < 1.4442]
-                for sample in refrence_samples:
-                    reference_sample_ = refrence_samples[sample]
-                    refrence_samples_[sample] = reference_sample_[abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) < 1.4442]
+                reference_sample_ = reference_sample_[abs(reference_sample_.el_SC_eta) < 1.4442]
+                data_color_idx, MC_color_idx, reference_sample_color = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[reference_key])
+                for sample in target_samples:
+                    target_sample_ = target_samples[sample]
+                    target_samples_[sample] = target_sample_[abs(target_sample_.el_SC_eta) < 1.4442]
+                    data_color_idx, MC_color_idx, target_samples_color[sample] = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[sample])
             else:
-                target_sample_ = target_sample_[abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) > 1.566]
-                for sample in refrence_samples:
-                    reference_sample_ = refrence_samples[sample]
-                    refrence_samples_[sample] = reference_sample_[abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) > 1.566]
+                reference_sample_ = reference_sample_[abs(reference_sample_.el_SC_eta) > 1.566]
+                data_color_idx, MC_color_idx, reference_sample_color = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[reference_key])
+                for sample in target_samples:
+                    target_sample_ = target_samples[sample]
+                    target_samples_[sample] = target_sample_[abs(target_sample_.el_SC_eta) > 1.566]
+                    data_color_idx, MC_color_idx, target_samples_color[sample] = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[sample])
 
-            for var in var_config.keys():
+            for var in vars_config.keys():
                 print(f"\t INFO: Saving histogram for '{var}' for probes in {probe_region}")
 
                 # create directory to save the histogram of the variable
@@ -257,38 +323,32 @@ class Commissioning_hists:
 
                 fig, ax = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, sharex=True, figsize=(8, 9))
                 fig.subplots_adjust(hspace=0.07)
-                hep.cms.label("Preliminary", data=False, com=13.6, ax=ax[0], fontsize=15)
+                hep.cms.label(input_config["CMS_label"], data=True, com=input_config["com"], lumi=input_config["lumi"], ax=ax[0], fontsize=15)
 
+                # for normalization
+                norm_sample = reference_sample_ if input_config["norm_sample"] in reference_sample.keys() else target_samples_[input_config["norm_sample"]]
+                h_, h_w_mean_, norm_val = self.get_histogram_with_overflow(vars_config[var], norm_sample[var], probe_region=probe_region, weight=1)
 
-                # create pileup correction
-                if not os.path.exists(f"{target_key}_MC2024.json"):
-                    create_correction(input_fileset[target_key]["pileup_root_file"], self.MC2024_pileup, outfile=f"{target_key}_MC2024.json", normalize_pu_mc_array=True)
-                pileup_corr = load_correction(f"{target_key}_MC2024.json")
+                hist_reference, yerr_reference = self.plot_var_histogram(input_fileset[reference_key], vars_config, reference_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=reference_sample_color)
+                _ = self.plot_fill_between_uncertainty(hist_reference, ax, color=reference_sample_color)
 
-                hist_target, norm_val = self.plot_var_histogram(input_fileset[target_key], var_config[var], target_sample_[var], ax, probe_region=probe_region, color="black")
-
-                for sample in refrence_samples_:
-                    refrence_sample_ = refrence_samples_[sample]
-
-                    # get pileup weights
-                    if input_fileset[sample]["isMC"]:
-                        weights = get_pileup_weight(refrence_sample_.Pileup_nTrueInt, pileup_corr)
-                    hist_reference_, _ = self.plot_var_histogram(input_fileset[sample], var_config[var], refrence_sample_[var], ax, probe_region=probe_region, norm_val=norm_val, color="deepskyblue")
-                    _ = self.plot_ratio(input_fileset[sample], hist_target, hist_reference_, ax, color="black")
-                    #hist_target.plot_ratio(hist_reference_)
+                for sample in target_samples_:
+                    target_sample_ = target_samples_[sample]
+                    hist_target_, yerr_target_ = self.plot_var_histogram(input_fileset[sample], vars_config, target_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=target_samples_color[sample])
+                    _ = self.plot_ratio(input_fileset[sample], hist_target_, hist_reference, yerr_target_, ax, color=target_samples_color[sample])
 
                 # plot reference line at y=1 for ratio plot
-                ax[1].plot([40, 1500], [1, 1], ".k", linestyle="--", linewidth=1)
+                ax[1].plot(vars_config[var]["hist_range"], [1, 1], color="black", linestyle="--", linewidth=1)
 
-                ax[0].set_xlim(var_config[var]["hist_range"])
+                ax[0].set_xlim(vars_config[var]["hist_range"])
                 ax[0].set_ylim([0, ax[0].set_ylim()[1] * 1.4])
                 ax[0].set_xlabel("")
                 ax[0].set_ylabel("Events")
                 ax[0].legend()
 
-                ax[1].set_xlim(var_config[var]["hist_range"])
+                ax[1].set_xlim(vars_config[var]["hist_range"])
                 ax[1].set_ylim([0, 2])
-                ax[1].set_ylabel("Data/MC")
+                ax[1].set_ylabel("Data/MC" if len(target_samples_.keys())==1 else "Ratio")
 
                 # save the histogram
                 plt.savefig(f"{self.out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.png", dpi=300, bbox_inches="tight")
@@ -326,6 +386,6 @@ class Commissioning_hists:
 out = Commissioning_hists(
         fileset_json="config/fileset_less.json",
         var_json="config/default_commissionig_binning.json",
-        out_dir="test2"
+        out_dir="test_new_error"
 )
 out.create_and_save_histograms()
