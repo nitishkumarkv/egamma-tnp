@@ -23,19 +23,18 @@ import sys
 
 from egamma_tnp.utils.pileup import load_correction, create_correction, get_pileup_weight
 
-
 class Commissioning_hists:
     def __init__(
         self,
         fileset_json,
         var_json,
-        out_dir,
         tag_pt_cut=35,
         probe_pt_cut=10,
         tag_max_SC_abseta=1.4442,
         probe_max_SC_abseta=2.5,
         Z_mass_range=[80, 100],
-        cutbased_id=None,
+        cutbased_id="cutBased >= 2",
+        hist_full_range=False,
         tag_sc_abseta_range=None,
         probe_abseta_range=None,
         extra_tags_mask=None,
@@ -45,13 +44,13 @@ class Commissioning_hists:
     ):
         self.fileset_json = fileset_json
         self.var_json = var_json
-        self.out_dir = out_dir
         self.tag_pt_cut = tag_pt_cut
         self.probe_pt_cut = probe_pt_cut
         self.tag_max_SC_abseta = tag_max_SC_abseta
         self.probe_max_SC_abseta = probe_max_SC_abseta
         self.Z_mass_range = Z_mass_range
         self.cutbased_id = cutbased_id
+        self.hist_full_range = hist_full_range
         self.tag_sc_abseta_range = tag_sc_abseta_range
         self.probe_abseta_range = probe_abseta_range
         self.extra_tags_mask = extra_tags_mask
@@ -69,6 +68,10 @@ class Commissioning_hists:
             fileset_json = json.load(file)
 
         return fileset_json
+
+    def save_json(self, content, json_path):
+        with open(json_path, 'w') as file:
+            json.dump(content, file, indent=4)
 
     def load_samples(self, samples_config):
         num_reference = 0
@@ -149,13 +152,13 @@ class Commissioning_hists:
             mask = lumimask(events.run, events.luminosityBlock)
             events = events[mask]
 
-        pass_loose_cutBased = (events["cutBased >= 1"])
+        pass_loose_cutBased = (events[self.cutbased_id])
 
         pass_tag_pt_cut = (events.tag_Ele_pt > self.tag_pt_cut)
         pass_probe_pt_cut = (events.el_pt > self.probe_pt_cut)
 
-        pass_tag_SC_abseta = (abs(events.tag_Ele_eta + events.tag_Ele_deltaEtaSC) < self.tag_max_SC_abseta)
-        pass_probe_SC_abseta = (abs(events.el_eta + events.el_deltaEtaSC) < self.probe_max_SC_abseta)
+        pass_tag_SC_abseta = (abs(events.tag_Ele_superclusterEta) < self.tag_max_SC_abseta)
+        pass_probe_SC_abseta = (abs(events.el_superclusterEta) < self.probe_max_SC_abseta)
 
         is_in_mass_range = (
             (events.pair_mass > self.Z_mass_range[0])
@@ -171,18 +174,17 @@ class Commissioning_hists:
             & is_in_mass_range
         ]
 
-        # add SC eta
-        events["tag_Ele_SC_eta"] = events.tag_Ele_eta + events.tag_Ele_deltaEtaSC
-        events["el_SC_eta"] = events.el_eta + events.el_deltaEtaSC
-
         return events
 
     def get_histogram_with_overflow(self, var_config, var_values, probe_region, weight):
 
         if var_config["custom_bin_edges"] is not None:
             bins = var_config["custom_bin_edges"]
+        elif self.hist_full_range:
+            bins = np.linspace(min(var_values), max(var_values), var_config["n_bins"]).tolist()
         else:
-            bins = np.linspace(var_config["hist_range"][0], var_config["hist_range"][1], var_config["n_bins"]).tolist()
+            hist_range = var_config["hist_range"] if isinstance(var_config["hist_range"], list) else var_config["hist_range"][probe_region]
+            bins = np.linspace(hist_range[0], hist_range[1], var_config["n_bins"]).tolist()
 
         x_label = f"{var_config['xlabel']} ({probe_region})"
 
@@ -233,7 +235,9 @@ class Commissioning_hists:
 
         hep.histplot(h, label=legend, histtype=hist_type, yerr=yerr, flow="sum", ax=ax[0], color=color)
 
-        return h, yerr
+        bin_width = h.axes[0].widths[0]
+
+        return h, yerr, bin_width
 
     def plot_ratio(self, samples_config, hist_target, hist_reference, yerr_target, ax, color):
         ratio, ratio_error = self.get_histograms_ratio(hist_target, hist_reference, yerr_target)
@@ -255,7 +259,7 @@ class Commissioning_hists:
             h.to_numpy()[1][:-1],
             lower_bound,
             upper_bound,
-            hatch='XXX',
+            hatch='XXXXX',
             step='post',
             facecolor="none",
             edgecolor=color,
@@ -265,16 +269,18 @@ class Commissioning_hists:
 
     def create_and_save_histograms(self):
 
-        print("len: ", len(self.MC2024_pileup))
-
-        # create directory to save the histograms
-        if not os.path.exists(self.out_dir):
-            os.makedirs(self.out_dir)
-        else:
-            sys.exit(f"\t The directory '{self.out_dir}' already exists. Exiting now to avoid overwriting existing plots.")
-
         vars_config = self.load_json(self.var_json)
         input_config = self.load_json(self.fileset_json)
+        out_dir = input_config["output_dir"]
+
+        # create directory to save the histograms
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        else:
+            sys.exit(f"\t The directory '{out_dir}' already exists. Exiting now to avoid overwriting existing plots.")
+
+        # save the input configuration in the plots directory, for future reference
+        self.save_json(input_config, f"{out_dir}/input_config.json")
 
         input_fileset = input_config["samples_to_compare"]
         pileup_histogram = input_config["pileup_histogram"]
@@ -301,25 +307,25 @@ class Commissioning_hists:
             target_samples_ = {}
             target_samples_color = {}
             if probe_region == "EB":
-                reference_sample_ = reference_sample_[abs(reference_sample_.el_SC_eta) < 1.4442]
+                reference_sample_ = reference_sample_[abs(reference_sample_.el_superclusterEta) < 1.4442]
                 data_color_idx, MC_color_idx, reference_sample_color = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[reference_key])
                 for sample in target_samples:
                     target_sample_ = target_samples[sample]
-                    target_samples_[sample] = target_sample_[abs(target_sample_.el_SC_eta) < 1.4442]
+                    target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) < 1.4442]
                     data_color_idx, MC_color_idx, target_samples_color[sample] = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[sample])
             else:
-                reference_sample_ = reference_sample_[abs(reference_sample_.el_SC_eta) > 1.566]
+                reference_sample_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
                 data_color_idx, MC_color_idx, reference_sample_color = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[reference_key])
                 for sample in target_samples:
                     target_sample_ = target_samples[sample]
-                    target_samples_[sample] = target_sample_[abs(target_sample_.el_SC_eta) > 1.566]
+                    target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
                     data_color_idx, MC_color_idx, target_samples_color[sample] = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[sample])
 
             for var in vars_config.keys():
                 print(f"\t INFO: Saving histogram for '{var}' for probes in {probe_region}")
 
                 # create directory to save the histogram of the variable
-                os.makedirs(f"{self.out_dir}/Variable_{var}_{probe_region}")
+                os.makedirs(f"{out_dir}/Variable_{var}_{probe_region}")
 
                 fig, ax = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, sharex=True, figsize=(8, 9))
                 fig.subplots_adjust(hspace=0.07)
@@ -329,43 +335,51 @@ class Commissioning_hists:
                 norm_sample = reference_sample_ if input_config["norm_sample"] in reference_sample.keys() else target_samples_[input_config["norm_sample"]]
                 h_, h_w_mean_, norm_val = self.get_histogram_with_overflow(vars_config[var], norm_sample[var], probe_region=probe_region, weight=1)
 
-                hist_reference, yerr_reference = self.plot_var_histogram(input_fileset[reference_key], vars_config, reference_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=reference_sample_color)
+                hist_reference, yerr_reference, bin_width = self.plot_var_histogram(input_fileset[reference_key], vars_config, reference_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=reference_sample_color)
                 _ = self.plot_fill_between_uncertainty(hist_reference, ax, color=reference_sample_color)
 
                 for sample in target_samples_:
                     target_sample_ = target_samples_[sample]
-                    hist_target_, yerr_target_ = self.plot_var_histogram(input_fileset[sample], vars_config, target_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=target_samples_color[sample])
+                    hist_target_, yerr_target_, bin_width_ = self.plot_var_histogram(input_fileset[sample], vars_config, target_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=target_samples_color[sample])
                     _ = self.plot_ratio(input_fileset[sample], hist_target_, hist_reference, yerr_target_, ax, color=target_samples_color[sample])
 
-                # plot reference line at y=1 for ratio plot
-                ax[1].plot(vars_config[var]["hist_range"], [1, 1], color="black", linestyle="--", linewidth=1)
 
-                ax[0].set_xlim(vars_config[var]["hist_range"])
+                # get hist range
+                hist_range = vars_config[var]["hist_range"] if isinstance(vars_config[var]["hist_range"], list) else vars_config[var]["hist_range"][probe_region]
+
+                # plot reference line at y=1 for ratio plot
+                ax[1].plot(hist_range, [1, 1], color="black", linestyle="--", linewidth=1)
+
+                ax[0].set_xlim(hist_range)
                 ax[0].set_ylim([0, ax[0].set_ylim()[1] * 1.4])
                 ax[0].set_xlabel("")
-                ax[0].set_ylabel("Events")
+
+                ylbl = "Events" if vars_config[var]["custom_bin_edges"] is not None else f"Events / {bin_width:.2g}"
+                ax[0].set_ylabel(ylbl)
+                ax[0].yaxis.get_offset_text().set_x(-0.085)
+
                 ax[0].legend()
 
-                ax[1].set_xlim(vars_config[var]["hist_range"])
+                ax[1].set_xlim(hist_range)
                 ax[1].set_ylim([0, 2])
                 ax[1].set_ylabel("Data/MC" if len(target_samples_.keys())==1 else "Ratio")
 
                 # save the histogram
-                plt.savefig(f"{self.out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.png", dpi=300, bbox_inches="tight")
-                plt.savefig(f"{self.out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.pdf", dpi=300, bbox_inches="tight")
+                plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.png", dpi=300, bbox_inches="tight")
+                plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.pdf", dpi=300, bbox_inches="tight")
 
                 # also save the plot in log scale
                 ax[0].set_yscale("log")
                 ax[0].set_ylim([0.01, ax[0].set_ylim()[1] * 100])
-                plt.savefig(f"{self.out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.png", dpi=300, bbox_inches="tight")
-                plt.savefig(f"{self.out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.pdf", dpi=300, bbox_inches="tight")
+                plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.png", dpi=300, bbox_inches="tight")
+                plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.pdf", dpi=300, bbox_inches="tight")
                 plt.clf()
 
         return 0
 
     def create_and_save_histograms_with_client(self):
 
-        #from hist.dask import Hist
+        from hist.dask import Hist
 
         with Client(n_workers=1, threads_per_worker=24) as _:
 
@@ -380,12 +394,15 @@ class Commissioning_hists:
         return 0
 
 
-
-
-
 out = Commissioning_hists(
         fileset_json="config/fileset_less.json",
         var_json="config/default_commissionig_binning.json",
-        out_dir="test_new_error"
 )
+#out = Commissioning_hists(
+#        fileset_json="config/fileset_less.json",
+#        var_json="config/default_commissionig_binning.json",
+#        out_dir="test_more_var2_full_range",
+#        hist_full_range=True
+#)
 out.create_and_save_histograms()
+#out.create_and_save_histograms_with_client()
