@@ -4,7 +4,7 @@ import dask_awkward as dak
 import awkward as ak
 import hist
 #from hist.dask import Hist
-from hist import Hist
+#from hist import Hist
 import numpy as np
 import json
 import mplhep as hep
@@ -35,6 +35,7 @@ class Commissioning_hists:
         Z_mass_range=[80, 100],
         cutbased_id="cutBased >= 2",
         hist_full_range=False,
+        use_dask=True,
         tag_sc_abseta_range=None,
         probe_abseta_range=None,
         extra_tags_mask=None,
@@ -51,6 +52,7 @@ class Commissioning_hists:
         self.Z_mass_range = Z_mass_range
         self.cutbased_id = cutbased_id
         self.hist_full_range = hist_full_range
+        self.use_dask = use_dask
         self.tag_sc_abseta_range = tag_sc_abseta_range
         self.probe_abseta_range = probe_abseta_range
         self.extra_tags_mask = extra_tags_mask
@@ -62,6 +64,13 @@ class Commissioning_hists:
         self.MC_color_list = ["deepskyblue", "limegreen", "hotpink"]
 
         self.MC2024_pileup = ak.Array([0.000001113213989874036, 0.0000015468091923934005, 0.0000021354450190071103, 0.0000029291338469218304, 0.000003992042749954428, 0.000005405833377829933, 0.0000072735834977346375, 0.000009724331962846662, 0.000012918274216272392, 0.0000170526149622419, 0.000022368057920838783, 0.000029155879571161017, 0.000037765494920067983, 0.000048612379683335426, 0.00006218616667282416, 0.0000790586873656787, 0.00009989168626752147, 0.00012544390044306957, 0.00015657717511638106, 0.0001942612850563351, 0.00023957715777935895, 0.0002937182560760011, 0.0003579899817243151, 0.00043380711678651587, 0.000522689529793492, 0.0006262566455876264, 0.0007462215105090346, 0.0008843856747819444, 0.0010426365496294917, 0.0012229493551649353, 0.0014273962186958265, 0.0016581653538683676, 0.0019175934660088899, 0.002208214475733204, 0.0025328271885712, 0.002894583494129698, 0.0032970968725650703, 0.003744568249914057, 0.0042419224608759715, 0.004794943739086138, 0.005410392925019933, 0.006096082865554651, 0.0068608824777247265, 0.007714615180320339, 0.00866781516074428, 0.009731306710317893, 0.010915579065169637, 0.012229942947193852, 0.013681475759704227, 0.01527378959087405, 0.017005687963005053, 0.01886981038809762, 0.020851393740706936, 0.022927300903420315, 0.02506547465186719, 0.027224963763031827, 0.029356636191662466, 0.03140464101794246, 0.033308610261160686, 0.0350065105276433, 0.03643797256026551, 0.03754785536879911, 0.038289751851088086, 0.03862912367701764, 0.038545769885154825, 0.0380353863028649, 0.037110056331124616, 0.03579761783198069, 0.03413996250306416, 0.032190428693587354, 0.030010532709785615, 0.027666337121796485, 0.02522477201906586, 0.02275020654952582, 0.0203015184549408, 0.017929837607910185, 0.01567705686218363, 0.013575121200719511, 0.011646034074885066, 0.009902465083581686, 0.00834880944787664, 0.006982537399290253, 0.005795678071150336, 0.004776303267056856, 0.003909906169865526, 0.0031806032900314855, 0.0025721201685428422, 0.002068549223952546, 0.0016548897331626839, 0.001317394620618747, 0.0010437568832815229, 0.0008231711610503282, 0.0006463045706591073, 0.0005052068974853441, 0.0003931848671938052, 0.00030465950668724277, 0.00023502024949971086, 0.00018048485172410123, 0.00013797053104661156, 0.00010497902395277662])
+
+        if self.use_dask:
+            from hist.dask import Hist
+        else:
+            from hist import Hist
+
+        self.Hist = Hist
 
     def load_json(self, json_path):
         with open(json_path, 'r') as file:
@@ -188,7 +197,7 @@ class Commissioning_hists:
 
         x_label = f"{var_config['xlabel']} ({probe_region})"
 
-        h = Hist(
+        h = self.Hist(
             hist.axis.Variable(bins, label=x_label, overflow=True, underflow=True),
             storage=hist.storage.Weight(),
         )
@@ -200,7 +209,7 @@ class Commissioning_hists:
 
     def get_histograms_ratio(self, hist_target, hist_reference, yerr_target):
         ratio_values = hist_target.values() / hist_reference.values()
-        ratio = hist.Hist(hist.Hist(*hist_target.axes))
+        ratio = self.Hist(self.Hist(*hist_target.axes))
         ratio[:] = np.nan_to_num(ratio_values)
 
         ratio_err_target = yerr_target / hist_target.values()
@@ -248,7 +257,8 @@ class Commissioning_hists:
         return 0
 
     def plot_fill_between_uncertainty(self, h, ax, color):
-        errors_den = np.sqrt(h.variances()) / h.values()
+
+        errors_den = np.sqrt(h.variances(flow=True)) / h.values(flow=True)
 
         errors_den = np.nan_to_num(errors_den)
 
@@ -256,7 +266,7 @@ class Commissioning_hists:
         upper_bound = 1 + errors_den
 
         ax[1].fill_between(
-            h.to_numpy()[1][:-1],
+            h.to_numpy(flow=True)[1][:-1],
             lower_bound,
             upper_bound,
             hatch='XXXXX',
@@ -377,32 +387,40 @@ class Commissioning_hists:
 
         return 0
 
-    def create_and_save_histograms_with_client(self):
+    def submit(self):
 
-        from hist.dask import Hist
+        if self.use_dask:
+            from dask.distributed import Client
+            from dask.diagnostics import ProgressBar
 
-        with Client(n_workers=1, threads_per_worker=24) as _:
+            with Client(n_workers=1, threads_per_worker=24) as _:
 
-            to_compute = self.create_and_save_histograms()
+                to_compute = self.create_and_save_histograms()
 
-            progress_bar = ProgressBar()
-            progress_bar.register()
+                progress_bar = ProgressBar()
+                progress_bar.register()
 
-            dask.compute(to_compute)
+                dask.compute(to_compute)
 
-            progress_bar.unregister()
-        return 0
+                progress_bar.unregister()
+
+        else:
+            self.create_and_save_histograms()
 
 
-out = Commissioning_hists(
-        fileset_json="config/fileset_less.json",
-        var_json="config/default_commissionig_binning.json",
-)
-#out = Commissioning_hists(
-#        fileset_json="config/fileset_less.json",
-#        var_json="config/default_commissionig_binning.json",
-#        out_dir="test_more_var2_full_range",
-#        hist_full_range=True
-#)
-out.create_and_save_histograms()
-#out.create_and_save_histograms_with_client()
+if __name__ == "__main__":
+    out = Commissioning_hists(
+            fileset_json="config/fileset_2024F.json",
+            var_json="config/default_commissionig_binning.json",
+            use_dask=False
+    )
+    #out = Commissioning_hists(
+    #        fileset_json="config/fileset_less.json",
+    #        var_json="config/default_commissionig_binning.json",
+    #        out_dir="test_more_var2_full_range",
+    #        hist_full_range=True
+    #)
+    #out.create_and_save_histograms()
+    #out.create_and_save_histograms_with_client()
+    #out.submit_dask()
+    out.submit()

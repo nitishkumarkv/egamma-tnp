@@ -113,7 +113,7 @@
     },
     "el_eSCOverP": {
         "name": "el_eSCOverP",
-        "xlabel": "E_{SC}/P",
+        "xlabel": "$E_{SC}$/P",
         "ylabel": "Events per bin",
         "hist_range": [0, 2],
         "n_bins": 60,
