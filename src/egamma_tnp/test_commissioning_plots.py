@@ -23,6 +23,10 @@ import sys
 
 from egamma_tnp.utils.pileup import load_correction, create_correction, get_pileup_weight
 
+import warnings
+warnings.filterwarnings('ignore', category=RuntimeWarning, message='invalid value encountered in divide')
+warnings.filterwarnings('ignore', category=RuntimeWarning, message='divide by zero encountered in divide')
+
 class Commissioning_hists:
     def __init__(
         self,
@@ -60,8 +64,8 @@ class Commissioning_hists:
         self.extra_filter = extra_filter
         self.extra_filter_args = extra_filter_args
 
-        self.data_color_list = ["black", "brown", "saddlebrown"]
-        self.MC_color_list = ["deepskyblue", "limegreen", "hotpink"]
+        self.data_color_list = ["black", "saddlebrown", "olive"]
+        self.MC_color_list = ["dodgerblue", "limegreen", "m"]
 
         self.MC2024_pileup = ak.Array([0.000001113213989874036, 0.0000015468091923934005, 0.0000021354450190071103, 0.0000029291338469218304, 0.000003992042749954428, 0.000005405833377829933, 0.0000072735834977346375, 0.000009724331962846662, 0.000012918274216272392, 0.0000170526149622419, 0.000022368057920838783, 0.000029155879571161017, 0.000037765494920067983, 0.000048612379683335426, 0.00006218616667282416, 0.0000790586873656787, 0.00009989168626752147, 0.00012544390044306957, 0.00015657717511638106, 0.0001942612850563351, 0.00023957715777935895, 0.0002937182560760011, 0.0003579899817243151, 0.00043380711678651587, 0.000522689529793492, 0.0006262566455876264, 0.0007462215105090346, 0.0008843856747819444, 0.0010426365496294917, 0.0012229493551649353, 0.0014273962186958265, 0.0016581653538683676, 0.0019175934660088899, 0.002208214475733204, 0.0025328271885712, 0.002894583494129698, 0.0032970968725650703, 0.003744568249914057, 0.0042419224608759715, 0.004794943739086138, 0.005410392925019933, 0.006096082865554651, 0.0068608824777247265, 0.007714615180320339, 0.00866781516074428, 0.009731306710317893, 0.010915579065169637, 0.012229942947193852, 0.013681475759704227, 0.01527378959087405, 0.017005687963005053, 0.01886981038809762, 0.020851393740706936, 0.022927300903420315, 0.02506547465186719, 0.027224963763031827, 0.029356636191662466, 0.03140464101794246, 0.033308610261160686, 0.0350065105276433, 0.03643797256026551, 0.03754785536879911, 0.038289751851088086, 0.03862912367701764, 0.038545769885154825, 0.0380353863028649, 0.037110056331124616, 0.03579761783198069, 0.03413996250306416, 0.032190428693587354, 0.030010532709785615, 0.027666337121796485, 0.02522477201906586, 0.02275020654952582, 0.0203015184549408, 0.017929837607910185, 0.01567705686218363, 0.013575121200719511, 0.011646034074885066, 0.009902465083581686, 0.00834880944787664, 0.006982537399290253, 0.005795678071150336, 0.004776303267056856, 0.003909906169865526, 0.0031806032900314855, 0.0025721201685428422, 0.002068549223952546, 0.0016548897331626839, 0.001317394620618747, 0.0010437568832815229, 0.0008231711610503282, 0.0006463045706591073, 0.0005052068974853441, 0.0003931848671938052, 0.00030465950668724277, 0.00023502024949971086, 0.00018048485172410123, 0.00013797053104661156, 0.00010497902395277662])
 
@@ -86,6 +90,9 @@ class Commissioning_hists:
         num_reference = 0
         reference_sample_dict = {}
         target_samples_dict = {}
+        common_fileds = []
+
+        print("\n")
 
         for key in samples_config.keys():
             if samples_config[key]["is_reference"]:
@@ -96,12 +103,16 @@ class Commissioning_hists:
                 num_reference += 1
                 print(f"\t INFO: Loading {key} parquet files")
                 reference_sample_dict[key] = self.basic_preselection(samples_config[key])
+                common_fileds.append(set(reference_sample_dict[key].fields))
 
             else:
                 print(f"\t INFO: Loading {key} parquet files")
                 target_samples_dict[key] = self.basic_preselection(samples_config[key])
+                common_fileds.append(set(target_samples_dict[key].fields))
 
-        return reference_sample_dict, target_samples_dict
+        common_fileds = set.intersection(*common_fileds)
+
+        return reference_sample_dict, target_samples_dict, common_fileds
 
     def fetch_golden_json(self, goldenjson_url):
 
@@ -166,8 +177,11 @@ class Commissioning_hists:
         pass_tag_pt_cut = (events.tag_Ele_pt > self.tag_pt_cut)
         pass_probe_pt_cut = (events.el_pt > self.probe_pt_cut)
 
-        pass_tag_SC_abseta = (abs(events.tag_Ele_superclusterEta) < self.tag_max_SC_abseta)
-        pass_probe_SC_abseta = (abs(events.el_superclusterEta) < self.probe_max_SC_abseta)
+        # pass_tag_SC_abseta = (abs(events.tag_Ele_superclusterEta) < self.tag_max_SC_abseta)
+        # pass_probe_SC_abseta = (abs(events.el_superclusterEta) < self.probe_max_SC_abseta)
+
+        pass_tag_SC_abseta = (abs(events.tag_Ele_eta + events.tag_Ele_deltaEtaSC) < self.tag_max_SC_abseta)
+        pass_probe_SC_abseta = (abs(events.el_eta + events.el_deltaEtaSC) < self.probe_max_SC_abseta)
 
         is_in_mass_range = (
             (events.pair_mass > self.Z_mass_range[0])
@@ -295,7 +309,7 @@ class Commissioning_hists:
         input_fileset = input_config["samples_to_compare"]
         pileup_histogram = input_config["pileup_histogram"]
 
-        reference_sample, target_samples = self.load_samples(input_fileset)
+        reference_sample, target_samples, common_fileds = self.load_samples(input_fileset)
 
         # create pileup correction
         if (pileup_histogram is not None) and (not os.path.exists(f"{pileup_histogram.split('.')[0]}_correction_MC2024.json")):
@@ -317,73 +331,91 @@ class Commissioning_hists:
             target_samples_ = {}
             target_samples_color = {}
             if probe_region == "EB":
-                reference_sample_ = reference_sample_[abs(reference_sample_.el_superclusterEta) < 1.4442]
+                # reference_sample_ = reference_sample_[abs(reference_sample_.el_superclusterEta) < 1.4442]
+                reference_sample_ = reference_sample_[abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) < 1.4442]
                 data_color_idx, MC_color_idx, reference_sample_color = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[reference_key])
                 for sample in target_samples:
                     target_sample_ = target_samples[sample]
-                    target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) < 1.4442]
+                    # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) < 1.4442]
+                    target_samples_[sample] = target_sample_[abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) < 1.4442]
                     data_color_idx, MC_color_idx, target_samples_color[sample] = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[sample])
             else:
-                reference_sample_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
+                # reference_sample_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
+                reference_sample_ = reference_sample_[abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) > 1.566]
                 data_color_idx, MC_color_idx, reference_sample_color = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[reference_key])
                 for sample in target_samples:
                     target_sample_ = target_samples[sample]
-                    target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
+                    # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
+                    target_samples_[sample] = target_sample_[abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) > 1.566]
                     data_color_idx, MC_color_idx, target_samples_color[sample] = self.get_color_index(data_color_idx, MC_color_idx, input_fileset[sample])
 
+            print("\n")
             for var in vars_config.keys():
-                print(f"\t INFO: Saving histogram for '{var}' for probes in {probe_region}")
+                if var in common_fileds:
+                    print(f"\t INFO: Saving histogram for '{var}' for probes in {probe_region}")
 
-                # create directory to save the histogram of the variable
-                os.makedirs(f"{out_dir}/Variable_{var}_{probe_region}")
+                    # create directory to save the histogram of the variable
+                    os.makedirs(f"{out_dir}/Variable_{var}_{probe_region}")
 
-                fig, ax = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, sharex=True, figsize=(8, 9))
-                fig.subplots_adjust(hspace=0.07)
-                hep.cms.label(input_config["CMS_label"], data=True, com=input_config["com"], lumi=input_config["lumi"], ax=ax[0], fontsize=15)
+                    fig, ax = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, sharex=True, figsize=(9, 9))#, constrained_layout=True)
+                    fig.subplots_adjust(hspace=0.07)
+                    fig.subplots_adjust(left=0.2)
+                    hep.cms.label(input_config["CMS_label"], data=True, com=input_config["com"], lumi=input_config["lumi"], ax=ax[0], fontsize=15)
 
-                # for normalization
-                norm_sample = reference_sample_ if input_config["norm_sample"] in reference_sample.keys() else target_samples_[input_config["norm_sample"]]
-                h_, h_w_mean_, norm_val = self.get_histogram_with_overflow(vars_config[var], norm_sample[var], probe_region=probe_region, weight=1)
+                    # for normalization
+                    norm_sample = reference_sample_ if input_config["norm_sample"] in reference_sample.keys() else target_samples_[input_config["norm_sample"]]
+                    h_, h_w_mean_, norm_val = self.get_histogram_with_overflow(vars_config[var], norm_sample[var], probe_region=probe_region, weight=1)
 
-                hist_reference, yerr_reference, bin_width = self.plot_var_histogram(input_fileset[reference_key], vars_config, reference_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=reference_sample_color)
-                _ = self.plot_fill_between_uncertainty(hist_reference, ax, color=reference_sample_color)
+                    hist_reference, yerr_reference, bin_width = self.plot_var_histogram(input_fileset[reference_key], vars_config, reference_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=reference_sample_color)
+                    _ = self.plot_fill_between_uncertainty(hist_reference, ax, color=reference_sample_color)
 
-                for sample in target_samples_:
-                    target_sample_ = target_samples_[sample]
-                    hist_target_, yerr_target_, bin_width_ = self.plot_var_histogram(input_fileset[sample], vars_config, target_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=target_samples_color[sample])
-                    _ = self.plot_ratio(input_fileset[sample], hist_target_, hist_reference, yerr_target_, ax, color=target_samples_color[sample])
+                    for sample in target_samples_:
+                        target_sample_ = target_samples_[sample]
+                        hist_target_, yerr_target_, bin_width_ = self.plot_var_histogram(input_fileset[sample], vars_config, target_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, color=target_samples_color[sample])
+                        _ = self.plot_ratio(input_fileset[sample], hist_target_, hist_reference, yerr_target_, ax, color=target_samples_color[sample])
 
 
-                # get hist range
-                hist_range = vars_config[var]["hist_range"] if isinstance(vars_config[var]["hist_range"], list) else vars_config[var]["hist_range"][probe_region]
+                    # get hist range
+                    hist_range = vars_config[var]["hist_range"] if isinstance(vars_config[var]["hist_range"], list) else vars_config[var]["hist_range"][probe_region]
 
-                # plot reference line at y=1 for ratio plot
-                ax[1].plot(hist_range, [1, 1], color="black", linestyle="--", linewidth=1)
+                    # plot reference line at y=1 for ratio plot
+                    ax[1].plot(hist_range, [1, 1], color="black", linestyle="--", linewidth=1)
 
-                ax[0].set_xlim(hist_range)
-                ax[0].set_ylim([0, ax[0].set_ylim()[1] * 1.4])
-                ax[0].set_xlabel("")
+                    ax[0].set_xlim(hist_range)
+                    ax[0].set_ylim([0, ax[0].set_ylim()[1] * 1.4])
+                    ax[0].set_xlabel("")
 
-                ylbl = "Events" if vars_config[var]["custom_bin_edges"] is not None else f"Events / {bin_width:.2g}"
-                ax[0].set_ylabel(ylbl)
-                ax[0].yaxis.get_offset_text().set_x(-0.085)
+                    ylbl = "Events" if vars_config[var]["custom_bin_edges"] is not None else f"Events / {bin_width:.2g}"
+                    ax[0].set_ylabel(ylbl)
+                    ax[0].yaxis.get_offset_text().set_x(-0.09)
+                    ax[0].yaxis.get_offset_text().set_y(1.15)
 
-                ax[0].legend()
+                    #ax[0].yaxis.set_major_formatter(plt.ScalarFormatter(useMathText=True))
+                    #ax[0].ticklabel_format(axis='y', style='scientific', scilimits=(0, 0))
 
-                ax[1].set_xlim(hist_range)
-                ax[1].set_ylim([0, 2])
-                ax[1].set_ylabel("Data/MC" if len(target_samples_.keys())==1 else "Ratio")
+                    if "mass" in var:
+                        ax[0].legend(fontsize=18)
+                    else: 
+                        ax[0].legend()
+                    #ax[0].legend()
 
-                # save the histogram
-                plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.png", dpi=300, bbox_inches="tight")
-                plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.pdf", dpi=300, bbox_inches="tight")
+                    ax[1].set_xlim(hist_range)
+                    ax[1].set_ylim([0, 2])
+                    ax[1].set_ylabel("Data/MC")
+                    #ax[1].grid(axis='y', linestyle='--', linewidth=0.5)
 
-                # also save the plot in log scale
-                ax[0].set_yscale("log")
-                ax[0].set_ylim([0.01, ax[0].set_ylim()[1] * 100])
-                plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.png", dpi=300, bbox_inches="tight")
-                plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.pdf", dpi=300, bbox_inches="tight")
-                plt.clf()
+                    # save the histogram
+                    plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.png", dpi=300)#, pad_inches=0.35)
+                    plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.pdf", dpi=300)#, pad_inches=0.35)
+
+                    # also save the plot in log scale
+                    ax[0].set_ylim([1e-2, ax[0].set_ylim()[1] * 800])
+                    ax[0].set_yscale("log")
+                    plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.png", dpi=300)#, pad_inches=0.35)
+                    plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.pdf", dpi=300)#, pad_inches=0.35)
+                    plt.clf()
+
+            plt.close()
 
         return 0
 
@@ -396,13 +428,8 @@ class Commissioning_hists:
             with Client(n_workers=1, threads_per_worker=24) as _:
 
                 to_compute = self.create_and_save_histograms()
-
-                progress_bar = ProgressBar()
-                progress_bar.register()
-
-                dask.compute(to_compute)
-
-                progress_bar.unregister()
+                with ProgressBar():
+                    dask.compute(to_compute)
 
         else:
             self.create_and_save_histograms()
@@ -410,7 +437,7 @@ class Commissioning_hists:
 
 if __name__ == "__main__":
     out = Commissioning_hists(
-            fileset_json="config/fileset_2024F.json",
+            fileset_json="config/fileset_2024C_two_versions.json",
             var_json="config/default_commissionig_binning.json",
             use_dask=False
     )

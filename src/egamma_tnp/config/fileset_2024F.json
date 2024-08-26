@@ -8,7 +8,7 @@
             "Legend": "Data2024F",
             "isMC": false,
             "is_reference": false,
-            "goldenjson": "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions24/Cert_Collisions2024_eraF_Golden.json"
+            "goldenjson": "https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions24/Cert_Collisions2024_378981_384052_Golden.json"
         },
         "DYTo2L": {
             "files": [

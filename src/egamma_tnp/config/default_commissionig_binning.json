@@ -289,7 +289,7 @@
     },
     "tag_Ele_eta": {
         "name": "tag_Ele_eta",
-        "xlabel": "$Tag $\\eta$",
+        "xlabel": "Tag $\\eta$",
         "ylabel": "Events per bin",
         "hist_range": [-1.5, 1.5],
         "n_bins": 60,
