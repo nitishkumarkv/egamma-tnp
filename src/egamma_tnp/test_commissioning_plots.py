@@ -177,9 +177,6 @@ class Commissioning_hists:
         pass_tag_pt_cut = (events.tag_Ele_pt > self.tag_pt_cut)
         pass_probe_pt_cut = (events.el_pt > self.probe_pt_cut)
 
-        # pass_tag_SC_abseta = (abs(events.tag_Ele_superclusterEta) < self.tag_max_SC_abseta)
-        # pass_probe_SC_abseta = (abs(events.el_superclusterEta) < self.probe_max_SC_abseta)
-
         pass_tag_SC_abseta = (abs(events.tag_Ele_eta + events.tag_Ele_deltaEtaSC) < self.tag_max_SC_abseta)
         pass_probe_SC_abseta = (abs(events.el_eta + events.el_deltaEtaSC) < self.probe_max_SC_abseta)
 
