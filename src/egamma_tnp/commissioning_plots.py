@@ -33,7 +33,7 @@ class Commissioning_hists:
         var_json,
         tag_pt_cut=35,
         probe_pt_cut=10,
-        tag_max_SC_abseta=1.4442,
+        tag_max_SC_abseta=2.5, #1.4442,
         probe_max_SC_abseta=2.5,
         Z_mass_range=[80, 100],
         cutbased_id="cutBased >= 2",
@@ -66,8 +66,12 @@ class Commissioning_hists:
         self.data_color_list = ["black", "saddlebrown", "green"]
         self.data_marker_list = ["o", "^", "v"]
         self.MC_color_list = ["dodgerblue", "limegreen", "m"]
+        #self.MC_color_list = ["blue", "green", "m"]
 
-        self.MC2024_pileup = ak.Array([0.000001113213989874036, 0.0000015468091923934005, 0.0000021354450190071103, 0.0000029291338469218304, 0.000003992042749954428, 0.000005405833377829933, 0.0000072735834977346375, 0.000009724331962846662, 0.000012918274216272392, 0.0000170526149622419, 0.000022368057920838783, 0.000029155879571161017, 0.000037765494920067983, 0.000048612379683335426, 0.00006218616667282416, 0.0000790586873656787, 0.00009989168626752147, 0.00012544390044306957, 0.00015657717511638106, 0.0001942612850563351, 0.00023957715777935895, 0.0002937182560760011, 0.0003579899817243151, 0.00043380711678651587, 0.000522689529793492, 0.0006262566455876264, 0.0007462215105090346, 0.0008843856747819444, 0.0010426365496294917, 0.0012229493551649353, 0.0014273962186958265, 0.0016581653538683676, 0.0019175934660088899, 0.002208214475733204, 0.0025328271885712, 0.002894583494129698, 0.0032970968725650703, 0.003744568249914057, 0.0042419224608759715, 0.004794943739086138, 0.005410392925019933, 0.006096082865554651, 0.0068608824777247265, 0.007714615180320339, 0.00866781516074428, 0.009731306710317893, 0.010915579065169637, 0.012229942947193852, 0.013681475759704227, 0.01527378959087405, 0.017005687963005053, 0.01886981038809762, 0.020851393740706936, 0.022927300903420315, 0.02506547465186719, 0.027224963763031827, 0.029356636191662466, 0.03140464101794246, 0.033308610261160686, 0.0350065105276433, 0.03643797256026551, 0.03754785536879911, 0.038289751851088086, 0.03862912367701764, 0.038545769885154825, 0.0380353863028649, 0.037110056331124616, 0.03579761783198069, 0.03413996250306416, 0.032190428693587354, 0.030010532709785615, 0.027666337121796485, 0.02522477201906586, 0.02275020654952582, 0.0203015184549408, 0.017929837607910185, 0.01567705686218363, 0.013575121200719511, 0.011646034074885066, 0.009902465083581686, 0.00834880944787664, 0.006982537399290253, 0.005795678071150336, 0.004776303267056856, 0.003909906169865526, 0.0031806032900314855, 0.0025721201685428422, 0.002068549223952546, 0.0016548897331626839, 0.001317394620618747, 0.0010437568832815229, 0.0008231711610503282, 0.0006463045706591073, 0.0005052068974853441, 0.0003931848671938052, 0.00030465950668724277, 0.00023502024949971086, 0.00018048485172410123, 0.00013797053104661156, 0.00010497902395277662])
+        self.pileup_profiles = {
+            "Winter2024MC": ak.Array([0.000001113213989874036, 0.0000015468091923934005, 0.0000021354450190071103, 0.0000029291338469218304, 0.000003992042749954428, 0.000005405833377829933, 0.0000072735834977346375, 0.000009724331962846662, 0.000012918274216272392, 0.0000170526149622419, 0.000022368057920838783, 0.000029155879571161017, 0.000037765494920067983, 0.000048612379683335426, 0.00006218616667282416, 0.0000790586873656787, 0.00009989168626752147, 0.00012544390044306957, 0.00015657717511638106, 0.0001942612850563351, 0.00023957715777935895, 0.0002937182560760011, 0.0003579899817243151, 0.00043380711678651587, 0.000522689529793492, 0.0006262566455876264, 0.0007462215105090346, 0.0008843856747819444, 0.0010426365496294917, 0.0012229493551649353, 0.0014273962186958265, 0.0016581653538683676, 0.0019175934660088899, 0.002208214475733204, 0.0025328271885712, 0.002894583494129698, 0.0032970968725650703, 0.003744568249914057, 0.0042419224608759715, 0.004794943739086138, 0.005410392925019933, 0.006096082865554651, 0.0068608824777247265, 0.007714615180320339, 0.00866781516074428, 0.009731306710317893, 0.010915579065169637, 0.012229942947193852, 0.013681475759704227, 0.01527378959087405, 0.017005687963005053, 0.01886981038809762, 0.020851393740706936, 0.022927300903420315, 0.02506547465186719, 0.027224963763031827, 0.029356636191662466, 0.03140464101794246, 0.033308610261160686, 0.0350065105276433, 0.03643797256026551, 0.03754785536879911, 0.038289751851088086, 0.03862912367701764, 0.038545769885154825, 0.0380353863028649, 0.037110056331124616, 0.03579761783198069, 0.03413996250306416, 0.032190428693587354, 0.030010532709785615, 0.027666337121796485, 0.02522477201906586, 0.02275020654952582, 0.0203015184549408, 0.017929837607910185, 0.01567705686218363, 0.013575121200719511, 0.011646034074885066, 0.009902465083581686, 0.00834880944787664, 0.006982537399290253, 0.005795678071150336, 0.004776303267056856, 0.003909906169865526, 0.0031806032900314855, 0.0025721201685428422, 0.002068549223952546, 0.0016548897331626839, 0.001317394620618747, 0.0010437568832815229, 0.0008231711610503282, 0.0006463045706591073, 0.0005052068974853441, 0.0003931848671938052, 0.00030465950668724277, 0.00023502024949971086, 0.00018048485172410123, 0.00013797053104661156, 0.00010497902395277662]),
+            "Summer2024MC": ak.Array([1.0599126204703409e-05, 3.951260716440464e-05, 5.582896642311492e-05, 6.453438928373494e-05, 7.94442211109479e-05, 7.937281404906837e-05, 8.907245068638336e-05, 9.415642420373598e-05, 9.502623228017968e-05, 9.199478729752352e-05, 0.00013938048564508576, 0.00017010543636561607, 0.0001134056824651737, 0.00014296639146898143, 0.0002581456179543262, 0.0005678611952417843, 0.0008332593678487858, 0.0009099520114358141, 0.0009172050801512289, 0.0009505506810280174, 0.0010644229070947433, 0.001339110596250398, 0.0018834003581107888, 0.0029865186505389474, 0.004897011268804792, 0.007488712649153006, 0.010316155472531027, 0.01280202341832599, 0.014747096050878332, 0.016326943326136174, 0.017545204330173675, 0.018522496650041513, 0.019313535713508023, 0.01993990862588472, 0.020383348878016044, 0.020721612374020128, 0.02102766065973508, 0.02150180376692927, 0.022073985047278605, 0.0226770721698269, 0.023284487595937403, 0.02396015609623849, 0.024817192902298803, 0.026070521311442062, 0.02789493736924733, 0.03041415774056745, 0.03431433930850965, 0.03926963065106093, 0.04413912495173111, 0.0482701694536395, 0.051618664470990054, 0.05375451405860295, 0.052590289193478454, 0.049365338159627375, 0.04486833402546383, 0.03819745898668014, 0.030826335590683835, 0.023458382461983215, 0.017085594960378436, 0.01195868965716555, 0.0078471509432766, 0.005033866678064158, 0.0031381464673017096, 0.001932392575354725, 0.0012357872700131897, 0.0007126320704765079, 0.0003612978990027777, 0.000182623168268646, 8.818852384472863e-05, 3.151355162852159e-05, 1.0187289280910454e-05, 4.7968992292803826e-06, 1.8577163576511699e-06, 5.729305524684033e-07, 2.602401818463374e-07, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 9.949892938900103e-09, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-15, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10])
+        }
 
         if self.use_dask:
             from hist.dask import Hist
@@ -86,33 +90,47 @@ class Commissioning_hists:
         with open(json_path, 'w') as file:
             json.dump(content, file, indent=4)
 
+    def get_fields_from_dak(self, file_lst):
+        fields = []
+        for file in file_lst:
+            fields.append(set(dak.from_parquet(file).fields))
+
+        return set.intersection(*fields)
+
     def load_samples(self, samples_config):
-        num_reference = 0
-        reference_sample_dict = {}
+        #num_reference = 0
+        reference_samples_dict = {}
         target_samples_dict = {}
         common_fileds = []
+
+        vars_config = self.load_json(self.var_json)
+        common_fileds.append(set(vars_config.keys()))
+        #print("before: ",common_fileds)
 
         print("\n")
 
         for key in samples_config.keys():
             if samples_config[key]["is_reference"]:
-                if num_reference > 0:
-                    print("There are more than one reference samples. Exiting now...")
-                    sys.exit()
 
-                num_reference += 1
+                common_fileds.append(self.get_fields_from_dak(samples_config[key]["files"]))
+            else:
+                common_fileds.append(self.get_fields_from_dak(samples_config[key]["files"]))
+
+        common_fileds = list(set.intersection(*common_fileds))
+
+
+        for key in samples_config.keys():
+            if samples_config[key]["is_reference"]:
+
                 print(f"\t INFO: Loading {key} parquet files")
-                reference_sample_dict[key] = self.basic_preselection(samples_config[key])
-                common_fileds.append(set(reference_sample_dict[key].fields))
+                reference_samples_dict[key] = self.basic_preselection(samples_config[key], common_fileds)
 
             else:
                 print(f"\t INFO: Loading {key} parquet files")
-                target_samples_dict[key] = self.basic_preselection(samples_config[key])
-                common_fileds.append(set(target_samples_dict[key].fields))
+                target_samples_dict[key] = self.basic_preselection(samples_config[key], common_fileds)
 
-        common_fileds = set.intersection(*common_fileds)
 
-        return reference_sample_dict, target_samples_dict, common_fileds
+        return reference_samples_dict, target_samples_dict, common_fileds
 
     def fetch_golden_json(self, goldenjson_url):
 
@@ -159,9 +177,15 @@ class Commissioning_hists:
 
         return data_idx, MC_idx, marker_style
 
-    def basic_preselection(self, sample_config):
+    def basic_preselection(self, sample_config, common_fields):
 
-        events = ak.from_parquet(sample_config["files"])
+        #events = ak.from_parquet(sample_config["files"], columns=common_fields)
+        if not sample_config["isMC"]:
+            common_fields += ["run", "luminosityBlock", "Pileup_nTrueInt"]
+
+        common_fields += ["cutBased >= 0", "cutBased >= 1", "cutBased >= 2", "cutBased >= 3", "cutBased >= 4", "tag_Ele_deltaEtaSC", "el_deltaEtaSC", "event"]
+
+        events = ak.concatenate([ak.from_parquet(file, columns=common_fields) for file in sample_config["files"]])
 
         if not sample_config["isMC"]:
 
@@ -170,7 +194,14 @@ class Commissioning_hists:
 
             lumimask = LumiMask(sample_config["goldenjson"])
             mask = lumimask(events.run, events.luminosityBlock)
+
             events = events[mask]
+
+        #if "Summer" in sample_config["files"][0]:
+        #    # remove evetns with event number greater than 2^31
+        #    print(events.event)
+        #    print(sum(events.event >= 2**31))
+        #    events = events[events.event < 2**31]
 
         pass_loose_cutBased = (events[self.cutbased_id])
 
@@ -203,7 +234,7 @@ class Commissioning_hists:
         elif self.hist_full_range:
             bins = np.linspace(min(var_values), max(var_values), var_config["n_bins"]).tolist()
         else:
-            hist_range = var_config["hist_range"] if isinstance(var_config["hist_range"], list) else var_config["hist_range"][probe_region]
+            hist_range = var_config["hist_range"] if isinstance(var_config["hist_range"], list) else var_config["hist_range"][probe_region[-2:]]
             bins = np.linspace(hist_range[0], hist_range[1], var_config["n_bins"]).tolist()
 
         x_label = f"{var_config['xlabel']} ({probe_region})"
@@ -231,12 +262,12 @@ class Commissioning_hists:
     def plot_var_histogram(self, samples_config, vars_config, samples, var, pileup_corr, ax, probe_region, marker_style, norm_val=None):
 
         if samples_config["isMC"] and pileup_corr is not None:
-            pileup_weight = get_pileup_weight(samples.Pileup_nTrueInt, pileup_corr)
+            weight = get_pileup_weight(samples.Pileup_nTrueInt, pileup_corr)
 
         else:
-            pileup_weight = 1
+            weight = 1
 
-        h, h_weighted_mean, _ = self.get_histogram_with_overflow(vars_config[var], samples[var], probe_region=probe_region, weight=pileup_weight)
+        h, h_weighted_mean, _ = self.get_histogram_with_overflow(vars_config[var], samples[var], probe_region=probe_region, weight=weight)
 
         legend = samples_config["Legend"]
 
@@ -248,8 +279,21 @@ class Commissioning_hists:
 
         if samples_config["isMC"]:
             hist_type = "step"
-            yerr = np.nan_to_num(np.sqrt(h.variances()))
-            hep.histplot(h, label=legend, histtype=hist_type, yerr=yerr, flow="sum", ax=ax[0], color=marker_style[0])
+            yerr = np.nan_to_num(np.sqrt(h.variances(flow=True)))
+
+            hep.histplot(h, label=legend, histtype=hist_type, flow="sum", ax=ax[0], color=marker_style[0], yerr=0)
+
+            values, bin_edges = h.to_numpy(flow=True)
+
+            values = np.concatenate([np.array([values[0] + values[1]]), values[2:-2], np.array([values[-1] + values[-2]]),  np.array([values[-1] + values[-2]])])
+            yerr = np.concatenate([np.array([np.sqrt(yerr[0]**2 + yerr[1]**2)]), yerr[2:-2], np.array([np.sqrt(yerr[-1]**2 + yerr[-2]**2)]), np.array([np.sqrt(yerr[-1]**2 + yerr[-2]**2)])])
+            bin_edges = bin_edges[1:-1]
+
+            ax[0].fill_between(bin_edges, values - yerr, values + yerr, step="post", alpha=0.4, color=marker_style[0])
+
+
+
+
         else:
             hist_type = "errorbar"
             yerr = np.nan_to_num(np.sqrt(h.values()))
@@ -276,24 +320,57 @@ class Commissioning_hists:
 
     def plot_fill_between_uncertainty(self, h, ax, marker_style):
 
-        errors_den = np.sqrt(h.variances(flow=True)) / h.values(flow=True)
+        values, bin_edges = h.to_numpy(flow=True)
+        values = np.concatenate([np.array([values[0] + values[1]]), values[2:-2], np.array([values[-1] + values[-2]]),  np.array([values[-1] + values[-2]])])
+        bin_edges = bin_edges[1:-1]
 
-        errors_den = np.nan_to_num(errors_den)
+        yerr = np.nan_to_num(np.sqrt(h.variances(flow=True)))
+        yerr = np.concatenate([np.array([np.sqrt(yerr[0]**2 + yerr[1]**2)]), yerr[2:-2], np.array([np.sqrt(yerr[-1]**2 + yerr[-2]**2)]), np.array([np.sqrt(yerr[-1]**2 + yerr[-2]**2)])])
+
+        errors_den = np.nan_to_num(yerr / values)
 
         lower_bound = 1 - errors_den
         upper_bound = 1 + errors_den
 
         ax[1].fill_between(
-            h.to_numpy(flow=True)[1][:-1],
+            bin_edges,
             lower_bound,
             upper_bound,
-            hatch='XXXXX',
             step='post',
-            facecolor="none",
+            facecolor=marker_style[0],
+            alpha=0.4
+        )
+        
+        return 0
+
+    def plot_fill_between_uncertainty_(self, h, ax, marker_style):
+
+        # Get histogram values, errors, and bin edges including under/overflow
+        values, bin_edges = h.to_numpy(flow=True)[:2]
+        errors = np.sqrt(h.variances(flow=True))  # Absolute errors
+
+        # Prevent division by zero
+        errors_den = np.where(values != 0, errors / values, 0)
+
+        # Convert errors into lower and upper bound bands
+        lower_bound = 1 - errors_den
+        upper_bound = 1 + errors_den
+
+        # Make sure we're using the correct bin centers (including over/underflow)
+        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2  # Midpoints of bins
+
+        # Plot the uncertainty band
+        ax[1].fill_between(
+            bin_centers,
+            lower_bound,
+            upper_bound,
+            step='mid',  # Ensure the step aligns properly
+            facecolor=marker_style[0],
             edgecolor=marker_style[0],
-            linewidth=0
+            alpha=0.4
         )
         return 0
+
 
     def create_and_save_histograms(self):
 
@@ -313,74 +390,202 @@ class Commissioning_hists:
         input_fileset = input_config["samples_to_compare"]
         pileup_histogram = input_config["pileup_histogram"]
 
-        reference_sample, target_samples, common_fileds = self.load_samples(input_fileset)
+        reference_samples, target_samples, common_fileds = self.load_samples(input_fileset)
 
+        pileup_corr = {}
         # create pileup correction
-        if (pileup_histogram is not None) and (not os.path.exists(f"{pileup_histogram.split('.')[0]}_correction_MC2024.json")):
-            create_correction(pileup_histogram, self.MC2024_pileup, outfile=f"{pileup_histogram.split('.')[0]}_correction_MC2024.json", normalize_pu_mc_array=True)
+        if pileup_histogram is not None:
+            #samples_pu = input_fileset
+            for key in input_fileset:
+                sample = input_fileset[key]
+                if sample["isMC"]:
+                    if not os.path.exists(f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json"):
+                        create_correction(pileup_histogram, self.pileup_profiles[sample["pileup_profile"]], outfile=f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json", normalize_pu_mc_array=True)
+                    
+                    if sample["pileup_profile"] not in pileup_corr:
+                        pileup_corr[sample["pileup_profile"]] = load_correction(f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json")
 
-        pileup_corr = load_correction(f"{pileup_histogram.split('.')[0]}_correction_MC2024.json")
+
+            
+
 
         plt.style.use(hep.style.CMS)
 
-        (reference_key, ) = reference_sample
+        #(reference_key, ) = reference_samples
 
-        for probe_region in ["EB", "EE"]:
+        #for probe_region in ["EB", "EE"]:
+        for region in ["EBEB", "EBEE", "EEEB", "EEEE"]:
+        #for region in ["EEEE"]:
 
-            reference_sample_ = reference_sample[reference_key]
 
             data_marker_idx = -1
             MC_marker_idx = -1
 
+            reference_samples_ = {}
             target_samples_ = {}
+            reference_samples_marker = {}
             target_samples_marker = {}
-            if probe_region == "EB":
-                # reference_sample_ = reference_sample_[abs(reference_sample_.el_superclusterEta) < 1.4442]
-                reference_sample_ = reference_sample_[abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) < 1.4442]
-                data_marker_idx, MC_marker_idx, reference_sample_marker = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[reference_key])
+
+#            if probe_region == "EB":
+#
+#                for sample in reference_samples:
+#                    reference_sample_ = reference_samples[sample]
+#                    # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) < 1.4442]
+#                    reference_samples_[sample] = reference_sample_[abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) < 1.4442]
+#                    data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+#
+#
+#                for sample in target_samples:
+#                    target_sample_ = target_samples[sample]
+#                    # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) < 1.4442]
+#                    target_samples_[sample] = target_sample_[abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) < 1.4442]
+#                    data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+#
+#            elif probe_region == "EE":
+#
+#                for sample in reference_samples:
+#                    reference_sample_ = reference_samples[sample]
+#                    # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
+#                    reference_samples_[sample] = reference_sample_[abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) > 1.566]
+#                    data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+#
+#                for sample in target_samples:
+#                    target_sample_ = target_samples[sample]
+#                    # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
+#                    target_samples_[sample] = target_sample_[abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) > 1.566]
+#                    data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+
+            if region == "EBEB":
+
+                for sample in reference_samples:
+                    reference_sample_ = reference_samples[sample]
+                    # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) < 1.4442]
+                    reference_samples_[sample] = reference_sample_[(abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) < 1.4442) 
+                                                                   & (abs(reference_sample_.tag_Ele_eta + reference_sample_.tag_Ele_deltaEtaSC) < 1.4442)]
+                    ak.to_parquet(reference_samples_[sample], f"{sample}_EBEB.parquet")
+                    data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+
+
                 for sample in target_samples:
                     target_sample_ = target_samples[sample]
                     # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) < 1.4442]
-                    target_samples_[sample] = target_sample_[abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) < 1.4442]
+                    target_samples_[sample] = target_sample_[(abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) < 1.4442) 
+                                                             & (abs(target_sample_.tag_Ele_eta + target_sample_.tag_Ele_deltaEtaSC) < 1.4442)]
+                    ak.to_parquet(target_samples_[sample], f"{sample}_EBEB.parquet")
                     data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
-            else:
-                # reference_sample_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
-                reference_sample_ = reference_sample_[abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) > 1.566]
-                data_marker_idx, MC_marker_idx, reference_sample_marker = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[reference_key])
+
+            elif region == "EBEE":
+
+                for sample in reference_samples:
+                    reference_sample_ = reference_samples[sample]
+                    # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
+                    reference_samples_[sample] = reference_sample_[(abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) > 1.566) 
+                                                                   & (abs(reference_sample_.tag_Ele_eta + reference_sample_.tag_Ele_deltaEtaSC) < 1.4442)]
+                    ak.to_parquet(reference_samples_[sample], f"{sample}_EBEE.parquet")
+                    data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+
                 for sample in target_samples:
                     target_sample_ = target_samples[sample]
                     # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
-                    target_samples_[sample] = target_sample_[abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) > 1.566]
+                    target_samples_[sample] = target_sample_[(abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) > 1.566) 
+                                                             & (abs(target_sample_.tag_Ele_eta + target_sample_.tag_Ele_deltaEtaSC) < 1.4442)]
+                    ak.to_parquet(target_samples_[sample], f"{sample}_EBEE.parquet")
+                    data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+                    
+            elif region == "EEEB":
+
+                for sample in reference_samples:
+                    reference_sample_ = reference_samples[sample]
+                    # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
+                    reference_samples_[sample] = reference_sample_[(abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) < 1.4442) 
+                                                                   & (abs(reference_sample_.tag_Ele_eta + reference_sample_.tag_Ele_deltaEtaSC) > 1.566)]
+                    ak.to_parquet(reference_samples_[sample], f"{sample}_EEEB.parquet")
+                    data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+
+                for sample in target_samples:
+                    target_sample_ = target_samples[sample]
+                    # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
+                    target_samples_[sample] = target_sample_[(abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) < 1.4442) 
+                                                             & (abs(target_sample_.tag_Ele_eta + target_sample_.tag_Ele_deltaEtaSC) > 1.566)]
+                    ak.to_parquet(target_samples_[sample], f"{sample}_EEEB.parquet")
+                    data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+
+            elif region == "EEEE":
+
+                for sample in reference_samples:
+                    reference_sample_ = reference_samples[sample]
+                    # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
+                    reference_samples_[sample] = reference_sample_[(abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) > 1.566) 
+                                                                   & (abs(reference_sample_.tag_Ele_eta + reference_sample_.tag_Ele_deltaEtaSC) > 1.566)]
+                    ak.to_parquet(reference_samples_[sample], f"{sample}_EEEE.parquet")
+                    data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
+
+                for sample in target_samples:
+                    target_sample_ = target_samples[sample]
+                    # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
+                    target_samples_[sample] = target_sample_[(abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) > 1.566) 
+                                                             & (abs(target_sample_.tag_Ele_eta + target_sample_.tag_Ele_deltaEtaSC) > 1.566)]
+                    ak.to_parquet(target_samples_[sample], f"{sample}_EEEE.parquet")
                     data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
 
             print("\n")
             for var in vars_config.keys():
                 if var in common_fileds:
-                    print(f"\t INFO: Saving histogram for '{var}' for probes in {probe_region}")
+                    
+                    print(f"\t INFO: Saving histogram for '{var}' for probes in {region}")
 
                     # create directory to save the histogram of the variable
-                    os.makedirs(f"{out_dir}/Variable_{var}_{probe_region}")
+                    os.makedirs(f"{out_dir}/Variable_{var}_{region}")
 
                     fig, ax = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, sharex=True, figsize=(9, 9))#, constrained_layout=True)
                     fig.subplots_adjust(hspace=0.07)
                     fig.subplots_adjust(left=0.2)
                     hep.cms.label(input_config["CMS_label"], data=True, com=input_config["com"], lumi=input_config["lumi"], ax=ax[0], fontsize=15)
 
-                    # for normalization
-                    norm_sample = reference_sample_ if input_config["norm_sample"] in reference_sample.keys() else target_samples_[input_config["norm_sample"]]
-                    h_, h_w_mean_, norm_val = self.get_histogram_with_overflow(vars_config[var], norm_sample[var], probe_region=probe_region, weight=1)
+                    
 
-                    hist_reference, yerr_reference, bin_width = self.plot_var_histogram(input_fileset[reference_key], vars_config, reference_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, marker_style=reference_sample_marker)
-                    _ = self.plot_fill_between_uncertainty(hist_reference, ax, marker_style=reference_sample_marker)
+
+
+                    # for normalization
+                    #norm_sample = reference_samples_ if input_config["norm_sample"] in reference_samples.keys() else target_samples_[input_config["norm_sample"]]
+                    norm_sample = reference_samples_[input_config["norm_sample"]] if input_config["norm_sample"] in reference_samples_.keys() else target_samples_[input_config["norm_sample"]]
+
+                        
+                    pileup_corr_for_norm = pileup_corr[input_fileset[input_config["norm_sample"]]["pileup_profile"]] if input_config["norm_sample"] in list(pileup_corr.keys()) else None
+                    if pileup_corr_for_norm is None:
+                        pu_norm_weight = 1
+                    else:
+                        pu_norm_weight = get_pileup_weight(norm_sample.Pileup_nTrueInt, pileup_corr_for_norm)
+
+                    h_, h_w_mean_, norm_val = self.get_histogram_with_overflow(vars_config[var], norm_sample[var], probe_region=region, weight=pu_norm_weight)
+
+                    hist_reference_dict = {}
+                    for sample in reference_samples_:
+                        reference_sample_ = reference_samples_[sample]
+                        pileup_corr_ = pileup_corr[input_fileset[sample]["pileup_profile"]] if input_fileset[sample]["isMC"] else None
+                        hist_reference_, yerr_reference_, bin_width = self.plot_var_histogram(input_fileset[sample], vars_config, reference_sample_, var, pileup_corr_, ax, probe_region=region, norm_val=norm_val, marker_style=reference_samples_marker[sample])
+                        hist_reference_dict[sample] = hist_reference_
+                        if input_fileset[sample]["isMC"]:
+                            _ = self.plot_fill_between_uncertainty(hist_reference_, ax, marker_style=reference_samples_marker[sample])
 
                     for sample in target_samples_:
                         target_sample_ = target_samples_[sample]
-                        hist_target_, yerr_target_, bin_width_ = self.plot_var_histogram(input_fileset[sample], vars_config, target_sample_, var, pileup_corr, ax, probe_region=probe_region, norm_val=norm_val, marker_style=target_samples_marker[sample])
-                        _ = self.plot_ratio(input_fileset[sample], hist_target_, hist_reference, yerr_target_, ax, marker_style=target_samples_marker[sample])
+                        pileup_corr_ = pileup_corr[input_fileset[sample]["pileup_profile"]] if input_fileset[sample]["isMC"] else None
+                        hist_target_, yerr_target_, bin_width_ = self.plot_var_histogram(input_fileset[sample], vars_config, target_sample_, var, pileup_corr_, ax, probe_region=region, norm_val=norm_val, marker_style=target_samples_marker[sample])
+
+                        ### plot ratio
+                        for ref_sample in reference_samples_:
+                            reference_sample_ = reference_samples_[ref_sample]
+                            if input_fileset[sample]["isMC"]:
+                                _ = self.plot_ratio(input_fileset[sample], hist_target_, hist_reference_dict[ref_sample], yerr_target_, ax, marker_style=target_samples_marker[sample])
+
+                            else:
+                                marker_style_for_ratio = [reference_samples_marker[ref_sample][0], target_samples_marker[sample][1]]
+                                _ = self.plot_ratio(input_fileset[sample], hist_target_, hist_reference_dict[ref_sample], yerr_target_, ax, marker_style=marker_style_for_ratio)
 
 
                     # get hist range
-                    hist_range = vars_config[var]["hist_range"] if isinstance(vars_config[var]["hist_range"], list) else vars_config[var]["hist_range"][probe_region]
+                    hist_range = vars_config[var]["hist_range"] if isinstance(vars_config[var]["hist_range"], list) else vars_config[var]["hist_range"][region[-2:]]
 
                     # plot reference line at y=1 for ratio plot
                     ax[1].plot(hist_range, [1, 1], color="black", linestyle="--", linewidth=1)
@@ -402,14 +607,14 @@ class Commissioning_hists:
                     #ax[1].grid(axis='y', linestyle='--', linewidth=0.5)
 
                     # save the histogram
-                    plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.png", dpi=300)#, pad_inches=0.35)
-                    plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}.pdf", dpi=300)#, pad_inches=0.35)
+                    plt.savefig(f"{out_dir}/Variable_{var}_{region}/{var}_{region}.png", dpi=300)#, pad_inches=0.35)
+                    plt.savefig(f"{out_dir}/Variable_{var}_{region}/{var}_{region}.pdf", dpi=300)#, pad_inches=0.35)
 
                     # also save the plot in log scale
                     ax[0].set_ylim([1, ax[0].set_ylim()[1] * 800])
                     ax[0].set_yscale("log")
-                    plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.png", dpi=300)#, pad_inches=0.35)
-                    plt.savefig(f"{out_dir}/Variable_{var}_{probe_region}/{var}_{probe_region}_log.pdf", dpi=300)#, pad_inches=0.35)
+                    plt.savefig(f"{out_dir}/Variable_{var}_{region}/{var}_{region}_log.png", dpi=300)#, pad_inches=0.35)
+                    plt.savefig(f"{out_dir}/Variable_{var}_{region}/{var}_{region}_log.pdf", dpi=300)#, pad_inches=0.35)
                     plt.clf()
 
             plt.close()
