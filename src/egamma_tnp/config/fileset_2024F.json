@@ -14,7 +14,7 @@
             "files": [
                 "/eos/cms/store/group/phys_egamma/tnpTuples/ikrommyd/NTuples/DYto2L-4Jets_MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8_Run3Winter24NanoAOD-EGMNanoV14_133X_mcRun3_2024_realistic_v10_ext2-v2_NANOAODSIM.parquet"
             ],
-            "Legend": "MC",
+            "Legend": "Winter24MC",
             "isMC": true,
             "is_reference": true
         }
@@ -22,7 +22,7 @@
     "pileup_histogram": "data_pileup/MyDataPileupHistogram_2024F.root",
     "CMS_label": "Preliminary",
     "com": 13.6,
-    "lumi": 2.02,
+    "lumi": 26.31,
     "norm_sample": "Run2024F",
-    "output_dir": "Run2024F_vs_Winter24MC"
+    "output_dir": "Run2024F_vs_Winter24MC_"
 }

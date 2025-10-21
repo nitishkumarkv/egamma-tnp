@@ -70,7 +70,8 @@ class Commissioning_hists:
 
         self.pileup_profiles = {
             "Winter2024MC": ak.Array([0.000001113213989874036, 0.0000015468091923934005, 0.0000021354450190071103, 0.0000029291338469218304, 0.000003992042749954428, 0.000005405833377829933, 0.0000072735834977346375, 0.000009724331962846662, 0.000012918274216272392, 0.0000170526149622419, 0.000022368057920838783, 0.000029155879571161017, 0.000037765494920067983, 0.000048612379683335426, 0.00006218616667282416, 0.0000790586873656787, 0.00009989168626752147, 0.00012544390044306957, 0.00015657717511638106, 0.0001942612850563351, 0.00023957715777935895, 0.0002937182560760011, 0.0003579899817243151, 0.00043380711678651587, 0.000522689529793492, 0.0006262566455876264, 0.0007462215105090346, 0.0008843856747819444, 0.0010426365496294917, 0.0012229493551649353, 0.0014273962186958265, 0.0016581653538683676, 0.0019175934660088899, 0.002208214475733204, 0.0025328271885712, 0.002894583494129698, 0.0032970968725650703, 0.003744568249914057, 0.0042419224608759715, 0.004794943739086138, 0.005410392925019933, 0.006096082865554651, 0.0068608824777247265, 0.007714615180320339, 0.00866781516074428, 0.009731306710317893, 0.010915579065169637, 0.012229942947193852, 0.013681475759704227, 0.01527378959087405, 0.017005687963005053, 0.01886981038809762, 0.020851393740706936, 0.022927300903420315, 0.02506547465186719, 0.027224963763031827, 0.029356636191662466, 0.03140464101794246, 0.033308610261160686, 0.0350065105276433, 0.03643797256026551, 0.03754785536879911, 0.038289751851088086, 0.03862912367701764, 0.038545769885154825, 0.0380353863028649, 0.037110056331124616, 0.03579761783198069, 0.03413996250306416, 0.032190428693587354, 0.030010532709785615, 0.027666337121796485, 0.02522477201906586, 0.02275020654952582, 0.0203015184549408, 0.017929837607910185, 0.01567705686218363, 0.013575121200719511, 0.011646034074885066, 0.009902465083581686, 0.00834880944787664, 0.006982537399290253, 0.005795678071150336, 0.004776303267056856, 0.003909906169865526, 0.0031806032900314855, 0.0025721201685428422, 0.002068549223952546, 0.0016548897331626839, 0.001317394620618747, 0.0010437568832815229, 0.0008231711610503282, 0.0006463045706591073, 0.0005052068974853441, 0.0003931848671938052, 0.00030465950668724277, 0.00023502024949971086, 0.00018048485172410123, 0.00013797053104661156, 0.00010497902395277662]),
-            "Summer2024MC": ak.Array([1.0599126204703409e-05, 3.951260716440464e-05, 5.582896642311492e-05, 6.453438928373494e-05, 7.94442211109479e-05, 7.937281404906837e-05, 8.907245068638336e-05, 9.415642420373598e-05, 9.502623228017968e-05, 9.199478729752352e-05, 0.00013938048564508576, 0.00017010543636561607, 0.0001134056824651737, 0.00014296639146898143, 0.0002581456179543262, 0.0005678611952417843, 0.0008332593678487858, 0.0009099520114358141, 0.0009172050801512289, 0.0009505506810280174, 0.0010644229070947433, 0.001339110596250398, 0.0018834003581107888, 0.0029865186505389474, 0.004897011268804792, 0.007488712649153006, 0.010316155472531027, 0.01280202341832599, 0.014747096050878332, 0.016326943326136174, 0.017545204330173675, 0.018522496650041513, 0.019313535713508023, 0.01993990862588472, 0.020383348878016044, 0.020721612374020128, 0.02102766065973508, 0.02150180376692927, 0.022073985047278605, 0.0226770721698269, 0.023284487595937403, 0.02396015609623849, 0.024817192902298803, 0.026070521311442062, 0.02789493736924733, 0.03041415774056745, 0.03431433930850965, 0.03926963065106093, 0.04413912495173111, 0.0482701694536395, 0.051618664470990054, 0.05375451405860295, 0.052590289193478454, 0.049365338159627375, 0.04486833402546383, 0.03819745898668014, 0.030826335590683835, 0.023458382461983215, 0.017085594960378436, 0.01195868965716555, 0.0078471509432766, 0.005033866678064158, 0.0031381464673017096, 0.001932392575354725, 0.0012357872700131897, 0.0007126320704765079, 0.0003612978990027777, 0.000182623168268646, 8.818852384472863e-05, 3.151355162852159e-05, 1.0187289280910454e-05, 4.7968992292803826e-06, 1.8577163576511699e-06, 5.729305524684033e-07, 2.602401818463374e-07, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 9.949892938900103e-09, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-15, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10])
+            "Summer2024MC": ak.Array([1.0599126204703409e-05, 3.951260716440464e-05, 5.582896642311492e-05, 6.453438928373494e-05, 7.94442211109479e-05, 7.937281404906837e-05, 8.907245068638336e-05, 9.415642420373598e-05, 9.502623228017968e-05, 9.199478729752352e-05, 0.00013938048564508576, 0.00017010543636561607, 0.0001134056824651737, 0.00014296639146898143, 0.0002581456179543262, 0.0005678611952417843, 0.0008332593678487858, 0.0009099520114358141, 0.0009172050801512289, 0.0009505506810280174, 0.0010644229070947433, 0.001339110596250398, 0.0018834003581107888, 0.0029865186505389474, 0.004897011268804792, 0.007488712649153006, 0.010316155472531027, 0.01280202341832599, 0.014747096050878332, 0.016326943326136174, 0.017545204330173675, 0.018522496650041513, 0.019313535713508023, 0.01993990862588472, 0.020383348878016044, 0.020721612374020128, 0.02102766065973508, 0.02150180376692927, 0.022073985047278605, 0.0226770721698269, 0.023284487595937403, 0.02396015609623849, 0.024817192902298803, 0.026070521311442062, 0.02789493736924733, 0.03041415774056745, 0.03431433930850965, 0.03926963065106093, 0.04413912495173111, 0.0482701694536395, 0.051618664470990054, 0.05375451405860295, 0.052590289193478454, 0.049365338159627375, 0.04486833402546383, 0.03819745898668014, 0.030826335590683835, 0.023458382461983215, 0.017085594960378436, 0.01195868965716555, 0.0078471509432766, 0.005033866678064158, 0.0031381464673017096, 0.001932392575354725, 0.0012357872700131897, 0.0007126320704765079, 0.0003612978990027777, 0.000182623168268646, 8.818852384472863e-05, 3.151355162852159e-05, 1.0187289280910454e-05, 4.7968992292803826e-06, 1.8577163576511699e-06, 5.729305524684033e-07, 2.602401818463374e-07, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 9.949892938900103e-09, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-15, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10, 1.1e-10]),
+            "Winter2025MC": ak.Array([0.0000010538773679583783, 0.0000014453031026961327, 0.000001970363090883917, 0.000002670281107593809, 0.000003597462798567677, 0.000004818033267765735, 0.000006414803175506918, 0.00000849069485055825, 0.000011172650635919335, 0.000014616032654130512, 0.000019009506082787833, 0.00002458037676190198, 0.00003160032867400924, 0.0000403914780629409, 0.0000513326296393648, 0.00006486558791741853, 0.00008150134525564022, 0.00010182594025209081, 0.00012650575898492516, 0.0001562920409839073, 0.00019202435605314403, 0.00023463284180945632, 0.0002851390399338541, 0.0003446552465146764, 0.0004143824030220098, 0.0004956067031895889, 0.0005896952798974523, 0.0006980915654970719, 0.0008223111862412097, 0.0009639395493586345, 0.0011246325961596164, 0.001306122503779093, 0.0015102303874063258, 0.0017388882349847804, 0.0019941723308908393, 0.0022783502088846506, 0.0025939426153526782, 0.002943800947840044, 0.0033311990480591035, 0.0037599359803347204, 0.004234443471816578, 0.0047598880701177565, 0.005342253951931872, 0.005988388019207414, 0.0067059849622914496, 0.0075034870576089615, 0.008389872464109042, 0.00937430762932423, 0.01046564500185625, 0.011671757233613201, 0.012998713670709948, 0.01444982377096003, 0.0160245939526876, 0.017717667226787342, 0.0195178359692353, 0.0214072340014225, 0.02336082128919122, 0.025346270004274998, 0.02732434240367562, 0.029249818558649544, 0.03107298698415659, 0.03274165737659939, 0.03420359754458777, 0.035409243087022646, 0.03631448568932437, 0.036883320614776005, 0.03709013079903057, 0.03692140594496318, 0.03637673898184205, 0.03546900479726313, 0.0342237001823724, 0.03267750066270309, 0.030876160122826117, 0.028871934631968292, 0.0267207465479145, 0.024479315695643617, 0.02220247134867907, 0.01994082511453152, 0.017738936250727092, 0.01563404440428138, 0.01365538752456454, 0.011824071217400022, 0.010153414981995273, 0.00864967347023981, 0.007313017889518202, 0.0061386628307422315, 0.0051180346517136965, 0.0042398957981439585, 0.0034913616164943813, 0.0028587691188455234, 0.002328378260551149, 0.001886903867739054, 0.0015218895230552547, 0.0012219433370943896, 0.0009768600068832721, 0.0007776546470029057, 0.0006165324821007001, 0.0004868155154920938, 0.000382843527372107, 0.0002998628250636046]),
         }
 
         if self.use_dask:
@@ -183,7 +184,7 @@ class Commissioning_hists:
         if not sample_config["isMC"]:
             common_fields += ["run", "luminosityBlock", "Pileup_nTrueInt"]
 
-        common_fields += ["cutBased >= 0", "cutBased >= 1", "cutBased >= 2", "cutBased >= 3", "cutBased >= 4", "tag_Ele_deltaEtaSC", "el_deltaEtaSC", "event"]
+        common_fields += ["cutBased >= 0", "cutBased >= 1", "cutBased >= 2", "cutBased >= 3", "cutBased >= 4", "tag_Ele_deltaEtaSC", "el_deltaEtaSC", "event", "Pileup_nTrueInt"]
 
         events = ak.concatenate([ak.from_parquet(file, columns=common_fields) for file in sample_config["files"]])
 
@@ -399,15 +400,24 @@ class Commissioning_hists:
             for key in input_fileset:
                 sample = input_fileset[key]
                 if sample["isMC"]:
+                    if "pileup_histogram" in list(sample.keys()):
+                        pileup_histogram = sample["pileup_histogram"]
+                        print("pileup_histogram: ", pileup_histogram)
                     if not os.path.exists(f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json"):
                         create_correction(pileup_histogram, self.pileup_profiles[sample["pileup_profile"]], outfile=f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json", normalize_pu_mc_array=True)
                     
-                    if sample["pileup_profile"] not in pileup_corr:
-                        pileup_corr[sample["pileup_profile"]] = load_correction(f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json")
+                    #if sample["pileup_profile"] not in pileup_corr:
+                    if f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json" not in pileup_corr:
+                        #pileup_corr[sample["pileup_profile"]] = load_correction(f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json")
+                        pileup_corr[f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json"] = load_correction(f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json")
+                        input_fileset[key]["pileup_profile"] = f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json"
+                        print(input_fileset[key]["pileup_profile"])
 
+                    if f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json" in pileup_corr:
+                        input_fileset[key]["pileup_profile"] = f"{pileup_histogram.split('.')[0]}_correction_{sample['pileup_profile']}.json"
 
-            
-
+        print("pileup_corr: ", pileup_corr)
+        print("input_fileset: ", input_fileset)
 
         plt.style.use(hep.style.CMS)
 
@@ -462,7 +472,7 @@ class Commissioning_hists:
                     # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) < 1.4442]
                     reference_samples_[sample] = reference_sample_[(abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) < 1.4442) 
                                                                    & (abs(reference_sample_.tag_Ele_eta + reference_sample_.tag_Ele_deltaEtaSC) < 1.4442)]
-                    ak.to_parquet(reference_samples_[sample], f"{sample}_EBEB.parquet")
+                    #ak.to_parquet(reference_samples_[sample], f"{sample}_EBEB.parquet")
                     data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
 
 
@@ -471,7 +481,7 @@ class Commissioning_hists:
                     # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) < 1.4442]
                     target_samples_[sample] = target_sample_[(abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) < 1.4442) 
                                                              & (abs(target_sample_.tag_Ele_eta + target_sample_.tag_Ele_deltaEtaSC) < 1.4442)]
-                    ak.to_parquet(target_samples_[sample], f"{sample}_EBEB.parquet")
+                    #ak.to_parquet(target_samples_[sample], f"{sample}_EBEB.parquet")
                     data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
 
             elif region == "EBEE":
@@ -481,7 +491,7 @@ class Commissioning_hists:
                     # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
                     reference_samples_[sample] = reference_sample_[(abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) > 1.566) 
                                                                    & (abs(reference_sample_.tag_Ele_eta + reference_sample_.tag_Ele_deltaEtaSC) < 1.4442)]
-                    ak.to_parquet(reference_samples_[sample], f"{sample}_EBEE.parquet")
+                    #ak.to_parquet(reference_samples_[sample], f"{sample}_EBEE.parquet")
                     data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
 
                 for sample in target_samples:
@@ -489,7 +499,7 @@ class Commissioning_hists:
                     # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
                     target_samples_[sample] = target_sample_[(abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) > 1.566) 
                                                              & (abs(target_sample_.tag_Ele_eta + target_sample_.tag_Ele_deltaEtaSC) < 1.4442)]
-                    ak.to_parquet(target_samples_[sample], f"{sample}_EBEE.parquet")
+                    #ak.to_parquet(target_samples_[sample], f"{sample}_EBEE.parquet")
                     data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
                     
             elif region == "EEEB":
@@ -499,7 +509,7 @@ class Commissioning_hists:
                     # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
                     reference_samples_[sample] = reference_sample_[(abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) < 1.4442) 
                                                                    & (abs(reference_sample_.tag_Ele_eta + reference_sample_.tag_Ele_deltaEtaSC) > 1.566)]
-                    ak.to_parquet(reference_samples_[sample], f"{sample}_EEEB.parquet")
+                    #ak.to_parquet(reference_samples_[sample], f"{sample}_EEEB.parquet")
                     data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
 
                 for sample in target_samples:
@@ -507,7 +517,7 @@ class Commissioning_hists:
                     # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
                     target_samples_[sample] = target_sample_[(abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) < 1.4442) 
                                                              & (abs(target_sample_.tag_Ele_eta + target_sample_.tag_Ele_deltaEtaSC) > 1.566)]
-                    ak.to_parquet(target_samples_[sample], f"{sample}_EEEB.parquet")
+                    #ak.to_parquet(target_samples_[sample], f"{sample}_EEEB.parquet")
                     data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
 
             elif region == "EEEE":
@@ -517,7 +527,7 @@ class Commissioning_hists:
                     # reference_samples_ = reference_sample_[abs(reference_sample_.el_superclusterEta) > 1.566]
                     reference_samples_[sample] = reference_sample_[(abs(reference_sample_.el_eta + reference_sample_.el_deltaEtaSC) > 1.566) 
                                                                    & (abs(reference_sample_.tag_Ele_eta + reference_sample_.tag_Ele_deltaEtaSC) > 1.566)]
-                    ak.to_parquet(reference_samples_[sample], f"{sample}_EEEE.parquet")
+                    #ak.to_parquet(reference_samples_[sample], f"{sample}_EEEE.parquet")
                     data_marker_idx, MC_marker_idx, reference_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
 
                 for sample in target_samples:
@@ -525,7 +535,7 @@ class Commissioning_hists:
                     # target_samples_[sample] = target_sample_[abs(target_sample_.el_superclusterEta) > 1.566]
                     target_samples_[sample] = target_sample_[(abs(target_sample_.el_eta + target_sample_.el_deltaEtaSC) > 1.566) 
                                                              & (abs(target_sample_.tag_Ele_eta + target_sample_.tag_Ele_deltaEtaSC) > 1.566)]
-                    ak.to_parquet(target_samples_[sample], f"{sample}_EEEE.parquet")
+                    #ak.to_parquet(target_samples_[sample], f"{sample}_EEEE.parquet")
                     data_marker_idx, MC_marker_idx, target_samples_marker[sample] = self.get_marker_index(data_marker_idx, MC_marker_idx, input_fileset[sample])
 
             print("\n")
